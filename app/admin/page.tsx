@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import CourseManager from '@/components/admin/CourseManager'
 import { BookOpen, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
