@@ -1,65 +1,142 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import StudentCard from '@/components/StudentCard'
+import ReportOutput from '@/components/ReportOutput'
+import { StudentEntry } from '@/lib/types'
+import { generateReport } from '@/lib/generateReport'
+import { supabase } from '@/lib/supabase'
+import { Plus, FileText, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { toast } from 'sonner'
+
+function generateId() {
+  return Math.random().toString(36).slice(2)
+}
+
+function emptyStudent(): StudentEntry {
+  return { id: generateId(), name: '', courseId: '', lessonId: '', topics: [] }
+}
+
+export default function HomePage() {
+  const [students, setStudents] = useState<StudentEntry[]>([emptyStudent()])
+  const [report, setReport] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const addStudent = () => setStudents((prev) => [...prev, emptyStudent()])
+
+  const removeStudent = (id: string) => {
+    setStudents((prev) => prev.filter((s) => s.id !== id))
+  }
+
+  const updateStudent = (updated: StudentEntry) => {
+    setStudents((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+  }
+
+  const handleGenerate = async () => {
+    const invalid = students.filter((s) => !s.name.trim() || !s.courseId || !s.lessonId)
+    if (invalid.length > 0) {
+      toast.error('Lengkapi nama, course, dan lesson untuk semua murid!')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const reportStudents = await Promise.all(
+        students.map(async (s) => {
+          const { data: courseData } = await supabase
+            .from('courses')
+            .select('name')
+            .eq('id', s.courseId)
+            .single()
+
+          const { data: lessonData } = await supabase
+            .from('lessons')
+            .select('number, title')
+            .eq('id', s.lessonId)
+            .single()
+
+          return {
+            name: s.name,
+            courseName: courseData?.name || '',
+            lessonNumber: lessonData?.number || 0,
+            lessonTitle: lessonData?.title || '',
+            topics: s.topics,
+          }
+        })
+      )
+
+      setReport(generateReport(reportStudents))
+    } catch {
+      toast.error('Terjadi kesalahan saat generate report')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FileText className="w-5 h-5 text-blue-600" />
+          <h1 className="font-bold text-lg">Report Generator</h1>
+          <span className="text-xs text-gray-400 hidden sm:inline">Timedoor Coding</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <Link href="/admin">
+          <Button variant="outline" size="sm">
+            <Settings className="w-4 h-4 mr-1" /> Kelola Course
+          </Button>
+        </Link>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-gray-700">Data Murid</h2>
+              <Button variant="outline" size="sm" onClick={addStudent}>
+                <Plus className="w-4 h-4 mr-1" /> Tambah Murid
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {students.map((student, index) => (
+                <StudentCard
+                  key={student.id}
+                  student={student}
+                  index={index}
+                  onChange={updateStudent}
+                  onRemove={() => removeStudent(student.id)}
+                />
+              ))}
+            </div>
+
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-base"
+              onClick={handleGenerate}
+              disabled={loading}
+            >
+              {loading ? 'Generating...' : '✨ Generate Report'}
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="font-semibold text-gray-700">Preview Report</h2>
+            {report ? (
+              <ReportOutput report={report} />
+            ) : (
+              <div className="border-2 border-dashed border-gray-200 rounded-xl h-64 flex items-center justify-center text-gray-400 bg-white">
+                <div className="text-center">
+                  <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p>Report akan muncul di sini</p>
+                  <p className="text-sm">Isi data murid lalu klik Generate</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
-  );
+  )
 }
