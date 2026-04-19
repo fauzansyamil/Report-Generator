@@ -1,142 +1,94 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import StudentCard from '@/components/StudentCard'
-import ReportOutput from '@/components/ReportOutput'
-import { StudentEntry } from '@/lib/types'
-import { generateReport } from '@/lib/generateReport'
-import { supabase } from '@/lib/supabase'
-import { Plus, FileText, Settings } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { toast } from 'sonner'
+import { FileText, ArrowRight, BookOpen } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
-function generateId() {
-  return Math.random().toString(36).slice(2)
-}
+const VantaGlobe = dynamic(() => import('@/components/VantaGlobe'), { ssr: false })
 
-function emptyStudent(): StudentEntry {
-  return { id: generateId(), name: '', courseId: '', lessonId: '', topics: [] }
-}
-
-export default function HomePage() {
-  const [students, setStudents] = useState<StudentEntry[]>([emptyStudent()])
-  const [report, setReport] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const addStudent = () => setStudents((prev) => [...prev, emptyStudent()])
-
-  const removeStudent = (id: string) => {
-    setStudents((prev) => prev.filter((s) => s.id !== id))
-  }
-
-  const updateStudent = (updated: StudentEntry) => {
-    setStudents((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
-  }
-
-  const handleGenerate = async () => {
-    const invalid = students.filter((s) => !s.name.trim() || !s.courseId || !s.lessonId)
-    if (invalid.length > 0) {
-      toast.error('Lengkapi nama, course, dan lesson untuk semua murid!')
-      return
-    }
-
-    setLoading(true)
-    try {
-      const reportStudents = await Promise.all(
-        students.map(async (s) => {
-          const { data: courseData } = await supabase
-            .from('courses')
-            .select('name')
-            .eq('id', s.courseId)
-            .single()
-
-          const { data: lessonData } = await supabase
-            .from('lessons')
-            .select('number, title')
-            .eq('id', s.lessonId)
-            .single()
-
-          return {
-            name: s.name,
-            courseName: courseData?.name || '',
-            lessonNumber: lessonData?.number || 0,
-            lessonTitle: lessonData?.title || '',
-            topics: s.topics,
-          }
-        })
-      )
-
-      setReport(generateReport(reportStudents))
-    } catch {
-      toast.error('Terjadi kesalahan saat generate report')
-    } finally {
-      setLoading(false)
-    }
-  }
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-600" />
-          <h1 className="font-bold text-lg">Report Generator</h1>
-          <span className="text-xs text-gray-400 hidden sm:inline">Timedoor Coding</span>
-        </div>
-        <Link href="/admin">
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4 mr-1" /> Kelola Course
-          </Button>
-        </Link>
-      </header>
+    <div className="relative min-h-screen overflow-hidden bg-slate-900 flex flex-col items-center justify-center">
+      <VantaGlobe />
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700">Data Murid</h2>
-              <Button variant="outline" size="sm" onClick={addStudent}>
-                <Plus className="w-4 h-4 mr-1" /> Tambah Murid
-              </Button>
-            </div>
+      {/* Overlay gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-transparent to-slate-900/60 pointer-events-none" />
 
-            <div className="space-y-4">
-              {students.map((student, index) => (
-                <StudentCard
-                  key={student.id}
-                  student={student}
-                  index={index}
-                  onChange={updateStudent}
-                  onRemove={() => removeStudent(student.id)}
-                />
-              ))}
-            </div>
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 max-w-3xl mx-auto">
 
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-6"
+        >
+          <span className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 text-blue-300 text-sm px-4 py-1.5 rounded-full backdrop-blur-sm">
+            <BookOpen className="w-4 h-4" />
+            Timedoor Coding Academy
+          </span>
+        </motion.div>
+
+        {/* Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="text-5xl sm:text-6xl font-bold text-white mb-4 leading-tight"
+        >
+          Report{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
+            Generator
+          </span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="text-lg text-slate-300 mb-10 max-w-xl leading-relaxed"
+        >
+          Buat laporan pembelajaran murid dengan cepat dan mudah.
+          Pilih course, lesson, dan kirim langsung ke orang tua via WhatsApp.
+        </motion.p>
+
+        {/* Features */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="flex flex-wrap justify-center gap-3 mb-10"
+        >
+          {['✨ Generate Otomatis', '📋 Copy Teks', '💬 Kirim via WhatsApp', '👥 Multi Murid'].map((f) => (
+            <span key={f} className="bg-white/10 backdrop-blur-sm border border-white/20 text-white/80 text-sm px-3 py-1.5 rounded-full">
+              {f}
+            </span>
+          ))}
+        </motion.div>
+
+        {/* CTA Button */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          <Link href="/generator">
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-base"
-              onClick={handleGenerate}
-              disabled={loading}
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:shadow-blue-500/50 hover:scale-105"
             >
-              {loading ? 'Generating...' : '✨ Generate Report'}
+              <FileText className="w-5 h-5 mr-2" />
+              Buat Report Sekarang
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-          </div>
+          </Link>
+        </motion.div>
 
-          <div className="space-y-4">
-            <h2 className="font-semibold text-gray-700">Preview Report</h2>
-            {report ? (
-              <ReportOutput report={report} />
-            ) : (
-              <div className="border-2 border-dashed border-gray-200 rounded-xl h-64 flex items-center justify-center text-gray-400 bg-white">
-                <div className="text-center">
-                  <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                  <p>Report akan muncul di sini</p>
-                  <p className="text-sm">Isi data murid lalu klik Generate</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   )
 }
