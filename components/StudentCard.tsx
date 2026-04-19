@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { X, Trash2 } from 'lucide-react'
+import { X, Trash2, User } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Course, Lesson, Topic, StudentEntry } from '@/lib/types'
 
@@ -29,18 +27,9 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
   }, [])
 
   useEffect(() => {
-    if (!student.courseId) {
-      setLessons([])
-      return
-    }
-    supabase
-      .from('lessons')
-      .select('*')
-      .eq('course_id', student.courseId)
-      .order('number')
-      .then(({ data }) => {
-        if (data) setLessons(data)
-      })
+    if (!student.courseId) { setLessons([]); return }
+    supabase.from('lessons').select('*').eq('course_id', student.courseId).order('number')
+      .then(({ data }) => { if (data) setLessons(data) })
   }, [student.courseId])
 
   const handleCourseChange = (courseId: string | null) => {
@@ -49,51 +38,49 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
 
   const handleLessonChange = async (lessonId: string | null) => {
     if (!lessonId) return
-    const { data } = await supabase
-      .from('topics')
-      .select('*')
-      .eq('lesson_id', lessonId)
-      .order('order_index')
-
-    onChange({
-      ...student,
-      lessonId,
-      topics: data ? data.map((t: Topic) => t.text) : [],
-    })
+    const { data } = await supabase.from('topics').select('*').eq('lesson_id', lessonId).order('order_index')
+    onChange({ ...student, lessonId, topics: data ? data.map((t: Topic) => t.text) : [] })
   }
 
-  const selectedLesson = lessons.find((l) => l.id === student.lessonId)
-
   return (
-    <Card className="border-2 border-blue-100">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden">
+      {/* Card Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">Murid {index + 1}</Badge>
-          {student.name && <span className="font-semibold text-sm">{student.name}</span>}
+          <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
+            <User className="w-3.5 h-3.5 text-blue-400" />
+          </div>
+          <span className="text-sm font-medium text-slate-300">Murid {index + 1}</span>
+          {student.name && (
+            <span className="text-sm font-semibold text-white">— {student.name}</span>
+          )}
         </div>
-        <Button variant="ghost" size="icon" onClick={onRemove} className="text-red-400 hover:text-red-600">
+        <button onClick={onRemove} className="text-slate-500 hover:text-red-400 transition-colors">
           <Trash2 className="w-4 h-4" />
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </button>
+      </div>
+
+      {/* Card Body */}
+      <div className="p-4 space-y-4">
         <div>
-          <Label>Nama Murid</Label>
+          <Label className="text-slate-400 text-xs mb-1.5 block">Nama Murid</Label>
           <Input
             placeholder="Contoh: Morgan"
             value={student.name}
             onChange={(e) => onChange({ ...student, name: e.target.value })}
+            className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20"
           />
         </div>
 
         <div>
-          <Label>Course</Label>
+          <Label className="text-slate-400 text-xs mb-1.5 block">Course</Label>
           <Select value={student.courseId} onValueChange={handleCourseChange}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white/5 border-white/10 text-white">
               <SelectValue placeholder="Pilih course..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-slate-900 border-white/10">
               {courses.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
+                <SelectItem key={c.id} value={c.id} className="text-slate-200 focus:bg-white/10 focus:text-white">
                   {c.name}
                 </SelectItem>
               ))}
@@ -103,14 +90,14 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
 
         {student.courseId && (
           <div>
-            <Label>Lesson</Label>
+            <Label className="text-slate-400 text-xs mb-1.5 block">Lesson</Label>
             <Select value={student.lessonId} onValueChange={handleLessonChange}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white/5 border-white/10 text-white">
                 <SelectValue placeholder="Pilih lesson..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-slate-900 border-white/10">
                 {lessons.map((l) => (
-                  <SelectItem key={l.id} value={l.id}>
+                  <SelectItem key={l.id} value={l.id} className="text-slate-200 focus:bg-white/10 focus:text-white">
                     Lesson {l.number} - {l.title}
                   </SelectItem>
                 ))}
@@ -121,17 +108,15 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
 
         {student.topics.length > 0 && (
           <div>
-            <Label>Topik yang dipelajari</Label>
-            <div className="space-y-2 mt-1">
+            <Label className="text-slate-400 text-xs mb-1.5 block">Topik yang dipelajari</Label>
+            <div className="space-y-1.5">
               {student.topics.map((topic, i) => (
-                <div key={i} className="flex items-center gap-2 bg-blue-50 rounded px-3 py-2 text-sm">
-                  <span className="flex-1">{topic}</span>
+                <div key={i} className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg px-3 py-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+                  <span className="flex-1 text-sm text-slate-200">{topic}</span>
                   <button
-                    onClick={() => {
-                      const updated = student.topics.filter((_, idx) => idx !== i)
-                      onChange({ ...student, topics: updated })
-                    }}
-                    className="text-gray-400 hover:text-red-500"
+                    onClick={() => onChange({ ...student, topics: student.topics.filter((_, idx) => idx !== i) })}
+                    className="text-slate-500 hover:text-red-400 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -140,7 +125,7 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

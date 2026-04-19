@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import StudentCard from '@/components/StudentCard'
 import ReportOutput from '@/components/ReportOutput'
+import DarkBackground from '@/components/DarkBackground'
 import { StudentEntry } from '@/lib/types'
 import { generateReport } from '@/lib/generateReport'
 import { supabase } from '@/lib/supabase'
-import { Plus, FileText, Settings, ArrowLeft } from 'lucide-react'
+import { Plus, FileText, Settings, ArrowLeft, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
@@ -19,7 +20,7 @@ function emptyStudent(): StudentEntry {
   return { id: generateId(), name: '', courseId: '', lessonId: '', topics: [] }
 }
 
-export default function HomePage() {
+export default function GeneratorPage() {
   const [students, setStudents] = useState<StudentEntry[]>([emptyStudent()])
   const [report, setReport] = useState('')
   const [loading, setLoading] = useState(false)
@@ -76,29 +77,47 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
+    <div className="relative min-h-screen text-white">
+      <DarkBackground />
+
+      {/* Header */}
+      <header className="relative z-10 bg-white/5 backdrop-blur-md border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-gray-400 hover:text-gray-600">
+          <Link href="/" className="text-slate-400 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <FileText className="w-5 h-5 text-blue-600" />
-          <h1 className="font-bold text-lg">Report Generator</h1>
-          <span className="text-xs text-gray-400 hidden sm:inline">Timedoor Coding</span>
+          <div className="w-px h-4 bg-white/10" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
+              <FileText className="w-3.5 h-3.5 text-blue-400" />
+            </div>
+            <h1 className="font-bold text-base text-white">Report Generator</h1>
+            <span className="text-xs text-slate-500 hidden sm:inline">Timedoor Coding</span>
+          </div>
         </div>
         <Link href="/admin">
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all"
+          >
             <Settings className="w-4 h-4 mr-1" /> Kelola Course
           </Button>
         </Link>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left: Student Data */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-700">Data Murid</h2>
-              <Button variant="outline" size="sm" onClick={addStudent}>
+              <h2 className="font-semibold text-slate-200">Data Murid</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addStudent}
+                className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all"
+              >
                 <Plus className="w-4 h-4 mr-1" /> Tambah Murid
               </Button>
             </div>
@@ -116,24 +135,35 @@ export default function HomePage() {
             </div>
 
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-base"
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-6 text-base rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-blue-500/40 hover:scale-[1.01] disabled:opacity-50 disabled:hover:scale-100"
               onClick={handleGenerate}
               disabled={loading}
             >
-              {loading ? 'Generating...' : '✨ Generate Report'}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Generating...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Generate Report
+                </span>
+              )}
             </Button>
           </div>
 
+          {/* Right: Report Preview */}
           <div className="space-y-4">
-            <h2 className="font-semibold text-gray-700">Preview Report</h2>
+            <h2 className="font-semibold text-slate-200">Preview Report</h2>
             {report ? (
               <ReportOutput report={report} />
             ) : (
-              <div className="border-2 border-dashed border-gray-200 rounded-xl h-64 flex items-center justify-center text-gray-400 bg-white">
-                <div className="text-center">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 border-dashed rounded-2xl h-64 flex items-center justify-center">
+                <div className="text-center text-slate-500">
                   <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                  <p>Report akan muncul di sini</p>
-                  <p className="text-sm">Isi data murid lalu klik Generate</p>
+                  <p className="text-sm">Report akan muncul di sini</p>
+                  <p className="text-xs mt-1 opacity-70">Isi data murid lalu klik Generate</p>
                 </div>
               </div>
             )}
