@@ -81,12 +81,27 @@ export default function LandingPage() {
             alt="Timedoor Academy"
             style={{ height: 28, width: 'auto' }}
           />
-          <div
-            className="flex items-center gap-2 rounded-full px-4 py-1.5"
-            style={{ background: 'rgba(45,197,110,0.15)', border: '1px solid rgba(45,197,110,0.3)' }}
-          >
-            <FileText className="w-4 h-4 text-green-400" />
-            <span className="text-sm font-semibold text-white/85">Report Generator</span>
+          <div className="flex items-center gap-2">
+            <Link href="/generator">
+              <button
+                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
+                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.8)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.14)'; (e.currentTarget as HTMLButtonElement).style.color = 'white' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.8)' }}
+              >
+                <FileText className="w-4 h-4" /> Report Generator
+              </button>
+            </Link>
+            <Link href="/admin">
+              <button
+                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
+                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.8)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.14)'; (e.currentTarget as HTMLButtonElement).style.color = 'white' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.8)' }}
+              >
+                <BookOpen className="w-4 h-4" /> Kelola Course
+              </button>
+            </Link>
           </div>
         </nav>
 
