@@ -22,9 +22,9 @@ export default function VantaGlobe() {
           minWidth: 200.0,
           scale: 1.0,
           scaleMobile: 1.0,
-          color: 0x3b82f6,
-          color2: 0x6366f1,
-          backgroundColor: 0x0f172a,
+          color: 0x2dc56e,
+          color2: 0x16a34a,
+          backgroundColor: 0x0d1f13,
           size: 1.2,
         })
       }

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { X, Trash2, User } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -47,8 +46,8 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
       {/* Card Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
-            <User className="w-3.5 h-3.5 text-blue-400" />
+          <div className="w-7 h-7 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center">
+            <User className="w-3.5 h-3.5 text-green-400" />
           </div>
           <span className="text-sm font-medium text-slate-300">Murid {index + 1}</span>
           {student.name && (
@@ -68,7 +67,7 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
             placeholder="Contoh: Morgan"
             value={student.name}
             onChange={(e) => onChange({ ...student, name: e.target.value })}
-            className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20"
+            className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-green-500/50 focus:ring-green-500/20"
           />
         </div>
 
@@ -111,8 +110,8 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
             <Label className="text-slate-400 text-xs mb-1.5 block">Topik yang dipelajari</Label>
             <div className="space-y-1.5">
               {student.topics.map((topic, i) => (
-                <div key={i} className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg px-3 py-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+                <div key={i} className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
                   <span className="flex-1 text-sm text-slate-200">{topic}</span>
                   <button
                     onClick={() => onChange({ ...student, topics: student.topics.filter((_, idx) => idx !== i) })}

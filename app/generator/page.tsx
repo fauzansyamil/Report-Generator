@@ -8,9 +8,10 @@ import DarkBackground from '@/components/DarkBackground'
 import { StudentEntry } from '@/lib/types'
 import { generateReport } from '@/lib/generateReport'
 import { supabase } from '@/lib/supabase'
-import { Plus, FileText, Settings, ArrowLeft, Sparkles } from 'lucide-react'
+import { Settings, Sparkles, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { Plus } from 'lucide-react'
 
 function generateId() {
   return Math.random().toString(36).slice(2)
@@ -46,18 +47,8 @@ export default function GeneratorPage() {
     try {
       const reportStudents = await Promise.all(
         students.map(async (s) => {
-          const { data: courseData } = await supabase
-            .from('courses')
-            .select('name')
-            .eq('id', s.courseId)
-            .single()
-
-          const { data: lessonData } = await supabase
-            .from('lessons')
-            .select('number, title')
-            .eq('id', s.lessonId)
-            .single()
-
+          const { data: courseData } = await supabase.from('courses').select('name').eq('id', s.courseId).single()
+          const { data: lessonData } = await supabase.from('lessons').select('number, title').eq('id', s.lessonId).single()
           return {
             name: s.name,
             courseName: courseData?.name || '',
@@ -67,7 +58,6 @@ export default function GeneratorPage() {
           }
         })
       )
-
       setReport(generateReport(reportStudents))
     } catch {
       toast.error('Terjadi kesalahan saat generate report')
@@ -81,27 +71,33 @@ export default function GeneratorPage() {
       <DarkBackground />
 
       {/* Header */}
-      <header className="relative z-10 bg-white/5 backdrop-blur-md border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-slate-400 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4" />
+      <header className="relative z-10 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between"
+        style={{ background: 'rgba(13,31,19,0.95)' }}>
+        <div className="flex items-center gap-4">
+          <Link href="/">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://spcdn.shortpixel.ai/spio/ret_img,q_cdnize/timedooracademy.com/wp-content/uploads/2022/09/timedoor-academy-2022-white-only.svg"
+              alt="Timedoor Academy"
+              style={{ height: 26, width: 'auto' }}
+            />
           </Link>
-          <div className="w-px h-4 bg-white/10" />
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
-              <FileText className="w-3.5 h-3.5 text-blue-400" />
-            </div>
-            <h1 className="font-bold text-base text-white">Report Generator</h1>
-            <span className="text-xs text-slate-500 hidden sm:inline">Timedoor Coding</span>
+          <div className="w-px h-4 bg-white/15" />
+          <div
+            className="flex items-center gap-2 rounded-full px-3 py-1.5"
+            style={{ background: 'rgba(45,197,110,0.15)', border: '1px solid rgba(45,197,110,0.3)' }}
+          >
+            <FileText className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-xs font-semibold text-white/85">Report Generator</span>
           </div>
         </div>
         <Link href="/admin">
           <Button
-            variant="outline"
-            size="sm"
-            className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all"
+            variant="outline" size="sm"
+            className="text-white/80 hover:text-white hover:bg-white/10 transition-all text-xs"
+            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
           >
-            <Settings className="w-4 h-4 mr-1" /> Kelola Course
+            <Settings className="w-3.5 h-3.5 mr-1.5" /> Kelola Course
           </Button>
         </Link>
       </header>
@@ -113,10 +109,9 @@ export default function GeneratorPage() {
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-slate-200">Data Murid</h2>
               <Button
-                variant="outline"
-                size="sm"
-                onClick={addStudent}
-                className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all"
+                variant="outline" size="sm" onClick={addStudent}
+                className="text-green-400 hover:text-green-300 transition-all text-xs"
+                style={{ background: 'rgba(45,197,110,0.12)', border: '1px solid rgba(45,197,110,0.3)' }}
               >
                 <Plus className="w-4 h-4 mr-1" /> Tambah Murid
               </Button>
@@ -135,7 +130,12 @@ export default function GeneratorPage() {
             </div>
 
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-6 text-base rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-blue-500/40 hover:scale-[1.01] disabled:opacity-50 disabled:hover:scale-100"
+              className="w-full py-6 text-base rounded-xl font-bold transition-all hover:scale-[1.01] disabled:opacity-50 disabled:hover:scale-100"
+              style={{
+                background: 'var(--tw-gradient-stops, #16a34a)',
+                backgroundColor: '#16a34a',
+                boxShadow: '0 4px 20px rgba(45,197,110,0.35)',
+              }}
               onClick={handleGenerate}
               disabled={loading}
             >
@@ -159,7 +159,10 @@ export default function GeneratorPage() {
             {report ? (
               <ReportOutput report={report} />
             ) : (
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 border-dashed rounded-2xl h-64 flex items-center justify-center">
+              <div
+                className="backdrop-blur-md rounded-2xl h-64 flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.15)' }}
+              >
                 <div className="text-center text-slate-500">
                   <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
                   <p className="text-sm">Report akan muncul di sini</p>

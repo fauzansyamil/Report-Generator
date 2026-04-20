@@ -27,13 +27,11 @@ export default function ReportOutput({ report }: ReportOutputProps) {
 
   return (
     <div className="space-y-3">
-      <div className="relative">
-        <Textarea
-          value={report}
-          readOnly
-          className="min-h-[400px] font-mono text-sm resize-none bg-white/5 border-white/10 text-slate-200 placeholder:text-slate-500 focus:border-blue-500/50 focus-visible:ring-0 focus-visible:ring-offset-0"
-        />
-      </div>
+      <Textarea
+        value={report}
+        readOnly
+        className="min-h-[400px] font-mono text-sm resize-none bg-white/5 border-white/10 text-slate-200 placeholder:text-slate-500 focus:border-green-500/50 focus-visible:ring-0 focus-visible:ring-offset-0"
+      />
       <div className="flex gap-2">
         <Button
           onClick={handleCopy}
