@@ -6,9 +6,18 @@ interface ReportStudent {
   topics: string[]
 }
 
-export function generateReport(students: ReportStudent[]): string {
+export type ReportTemplate = 'standard' | 'singkat'
+
+export function generateReport(students: ReportStudent[], template: ReportTemplate = 'standard'): string {
   if (students.length === 0) return ''
 
+  if (template === 'singkat') {
+    return generateSingkat(students)
+  }
+  return generateStandard(students)
+}
+
+function generateStandard(students: ReportStudent[]): string {
   const names = students.map((s) => s.name).join(', ')
   const pronoun = students.length === 1 ? 'Dia' : 'Mereka'
 
@@ -31,4 +40,22 @@ ${topicList}`
 Anak-anak mengikuti pembelajaran dengan baik hari ini dan menunjukkan perkembangan yang positif. Semoga pengalaman belajar ini dapat terus meningkatkan pemahaman dan kepercayaan diri mereka 😊👋🏻`
 
   return `${header}\n\n${body}\n\n${footer}`
+}
+
+function generateSingkat(students: ReportStudent[]): string {
+  const body = students
+    .map((s) => {
+      const topicList = s.topics.map((t) => `- ${t}`).join('\n')
+      return `Progres belajar ${s.name} saat ini sudah mencapai:
+
+📘 ${s.courseName}:
+Lesson ${s.lessonNumber} - ${s.lessonTitle}
+${topicList}
+
+🧠 Sejauh ini ${s.name} dapat memahami materi dengan baik dan melakukan problem solving yang baik.
+💪 Semangat terus belajarnya ${s.name}`
+    })
+    .join('\n\n')
+
+  return body
 }

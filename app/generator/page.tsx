@@ -6,7 +6,7 @@ import StudentCard from '@/components/StudentCard'
 import ReportOutput from '@/components/ReportOutput'
 import DarkBackground from '@/components/DarkBackground'
 import { StudentEntry } from '@/lib/types'
-import { generateReport } from '@/lib/generateReport'
+import { generateReport, ReportTemplate } from '@/lib/generateReport'
 import { supabase } from '@/lib/supabase'
 import { Settings, Sparkles, FileText } from 'lucide-react'
 import Link from 'next/link'
@@ -21,10 +21,16 @@ function emptyStudent(): StudentEntry {
   return { id: generateId(), name: '', courseId: '', lessonId: '', topics: [] }
 }
 
+const TEMPLATES: { value: ReportTemplate; label: string; desc: string }[] = [
+  { value: 'standard', label: 'Standard', desc: 'Format lengkap dengan pembuka & penutup' },
+  { value: 'singkat', label: 'Singkat', desc: 'Format ringkas per progres murid' },
+]
+
 export default function GeneratorPage() {
   const [students, setStudents] = useState<StudentEntry[]>([emptyStudent()])
   const [report, setReport] = useState('')
   const [loading, setLoading] = useState(false)
+  const [template, setTemplate] = useState<ReportTemplate>('standard')
 
   const addStudent = () => setStudents((prev) => [...prev, emptyStudent()])
 
@@ -58,7 +64,7 @@ export default function GeneratorPage() {
           }
         })
       )
-      setReport(generateReport(reportStudents))
+      setReport(generateReport(reportStudents, template))
     } catch {
       toast.error('Terjadi kesalahan saat generate report')
     } finally {
@@ -127,6 +133,38 @@ export default function GeneratorPage() {
                   onRemove={() => removeStudent(student.id)}
                 />
               ))}
+            </div>
+
+            {/* Template Selector */}
+            <div
+              className="rounded-xl p-4"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3">Template Report</p>
+              <div className="grid grid-cols-2 gap-2">
+                {TEMPLATES.map((t) => (
+                  <button
+                    key={t.value}
+                    onClick={() => setTemplate(t.value)}
+                    className="text-left rounded-xl p-3 transition-all"
+                    style={{
+                      background: template === t.value ? 'rgba(45,197,110,0.15)' : 'rgba(255,255,255,0.04)',
+                      border: template === t.value ? '1px solid rgba(45,197,110,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ background: template === t.value ? '#2dc56e' : 'rgba(255,255,255,0.2)' }}
+                      />
+                      <span className={`text-sm font-semibold ${template === t.value ? 'text-green-400' : 'text-white/60'}`}>
+                        {t.label}
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/40 pl-4">{t.desc}</p>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <Button
