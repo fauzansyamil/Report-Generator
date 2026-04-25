@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import DarkBackground from '@/components/DarkBackground'
-import { Lock, Eye, EyeOff, BookOpen } from 'lucide-react'
+import { Lock, Eye, EyeOff, BookOpen, ArrowLeft } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -38,19 +39,34 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen text-white flex items-center justify-center">
+    <div className="relative min-h-screen text-white">
       <DarkBackground />
 
-      <div className="relative z-10 w-full max-w-sm px-4">
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
+      {/* Header */}
+      <header
+        className="relative z-10 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between"
+        style={{ background: 'rgba(13,31,19,0.95)' }}
+      >
+        <Link href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="https://spcdn.shortpixel.ai/spio/ret_img,q_cdnize/timedooracademy.com/wp-content/uploads/2022/09/timedoor-academy-2022-white-only.svg"
             alt="Timedoor Academy"
-            style={{ height: 32, width: 'auto' }}
+            style={{ height: 26, width: 'auto' }}
           />
-        </div>
+        </Link>
+        <Link
+          href="/"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
+          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)' }}
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Kembali
+        </Link>
+      </header>
+
+      <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-56px)]">
+      <div className="w-full max-w-sm px-4">
 
         {/* Card */}
         <div
@@ -129,6 +145,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
         </div>
+      </div>
       </div>
     </div>
   )
