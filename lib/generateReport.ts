@@ -1,9 +1,13 @@
-interface ReportStudent {
-  name: string
-  courseName: string
+interface ReportLesson {
   lessonNumber: number
   lessonTitle: string
   topics: string[]
+}
+
+interface ReportStudent {
+  name: string
+  courseName: string
+  lessons: ReportLesson[]
 }
 
 export type ReportTemplate = 'standard' | 'singkat'
@@ -26,12 +30,14 @@ Terima kasih atas kehadiran dan partisipasi ${names} dalam kelas kali ini. ${pro
 
   const body = students
     .map((s) => {
-      const topicList = s.topics.map((t) => `- ${t}`).join('\n')
+      const lessonBlock = s.lessons.map((l) => {
+        const topicList = l.topics.map((t) => `- ${t}`).join('\n')
+        return `Lesson ${l.lessonNumber} - ${l.lessonTitle}\n${topicList}`
+      }).join('\n\n')
       return `Progres belajar ${s.name} saat ini sudah mencapai:
 
 📘 ${s.courseName}:
-Lesson ${s.lessonNumber} - ${s.lessonTitle}
-${topicList}`
+${lessonBlock}`
     })
     .join('\n\n')
 
@@ -45,12 +51,14 @@ Anak-anak mengikuti pembelajaran dengan baik hari ini dan menunjukkan perkembang
 function generateSingkat(students: ReportStudent[]): string {
   const body = students
     .map((s) => {
-      const topicList = s.topics.map((t) => `- ${t}`).join('\n')
+      const lessonBlock = s.lessons.map((l) => {
+        const topicList = l.topics.map((t) => `- ${t}`).join('\n')
+        return `Lesson ${l.lessonNumber} - ${l.lessonTitle}\n${topicList}`
+      }).join('\n\n')
       return `Progres belajar ${s.name} saat ini sudah mencapai:
 
 📘 ${s.courseName}:
-Lesson ${s.lessonNumber} - ${s.lessonTitle}
-${topicList}
+${lessonBlock}
 
 🧠 Sejauh ini ${s.name} dapat memahami materi dengan baik dan melakukan problem solving yang baik.
 💪 Semangat terus belajarnya ${s.name}`

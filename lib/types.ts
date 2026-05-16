@@ -20,10 +20,14 @@ export interface Topic {
   created_at: string
 }
 
+export interface LessonEntry {
+  lessonId: string
+  topics: string[]
+}
+
 export interface StudentEntry {
   id: string
   name: string
   courseId: string
-  lessonId: string
-  topics: string[]
+  lessons: LessonEntry[]
 }

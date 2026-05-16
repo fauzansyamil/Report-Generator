@@ -18,7 +18,7 @@ function generateId() {
 }
 
 function emptyStudent(): StudentEntry {
-  return { id: generateId(), name: '', courseId: '', lessonId: '', topics: [] }
+  return { id: generateId(), name: '', courseId: '', lessons: [{ lessonId: '', topics: [] }] }
 }
 
 const TEMPLATES: { value: ReportTemplate; label: string; desc: string }[] = [
@@ -43,9 +43,11 @@ export default function GeneratorPage() {
   }
 
   const handleGenerate = async () => {
-    const invalid = students.filter((s) => !s.name.trim() || !s.courseId || !s.lessonId)
+    const invalid = students.filter(
+      (s) => !s.name.trim() || !s.courseId || s.lessons.some((l) => !l.lessonId)
+    )
     if (invalid.length > 0) {
-      toast.error('Lengkapi nama, course, dan lesson untuk semua murid!')
+      toast.error('Lengkapi nama, course, dan semua lesson untuk semua murid!')
       return
     }
 
@@ -54,13 +56,20 @@ export default function GeneratorPage() {
       const reportStudents = await Promise.all(
         students.map(async (s) => {
           const { data: courseData } = await supabase.from('courses').select('name').eq('id', s.courseId).single()
-          const { data: lessonData } = await supabase.from('lessons').select('number, title').eq('id', s.lessonId).single()
+          const lessons = await Promise.all(
+            s.lessons.map(async (l) => {
+              const { data: lessonData } = await supabase.from('lessons').select('number, title').eq('id', l.lessonId).single()
+              return {
+                lessonNumber: lessonData?.number || 0,
+                lessonTitle: lessonData?.title || '',
+                topics: l.topics,
+              }
+            })
+          )
           return {
             name: s.name,
             courseName: courseData?.name || '',
-            lessonNumber: lessonData?.number || 0,
-            lessonTitle: lessonData?.title || '',
-            topics: s.topics,
+            lessons,
           }
         })
       )
