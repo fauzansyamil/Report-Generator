@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { X, Trash2, User, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { Course, Lesson, Topic, StudentEntry, LessonEntry } from '@/lib/types'
+import { Course, Lesson, Topic, StudentEntry } from '@/lib/types'
 
 interface StudentCardProps {
   student: StudentEntry
