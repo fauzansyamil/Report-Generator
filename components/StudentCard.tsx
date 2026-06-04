@@ -97,7 +97,7 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
         <div>
           <Label className="text-slate-400 text-xs mb-1.5 block">Course</Label>
           <Select value={student.courseId} onValueChange={handleCourseChange}>
-            <SelectTrigger className="bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
               <SelectValue placeholder="Pilih course..." />
             </SelectTrigger>
             <SelectContent className="bg-slate-900 border-white/10">
@@ -123,7 +123,7 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
                       value={lessonEntry.lessonId}
                       onValueChange={(val) => handleLessonChange(lessonIndex, val)}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                      <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
                         <SelectValue placeholder="Pilih lesson..." />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-900 border-white/10">
