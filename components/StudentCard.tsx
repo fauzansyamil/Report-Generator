@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { X, Trash2, User, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Course, Lesson, Topic, StudentEntry } from '@/lib/types'
+import { toast } from 'sonner'
 
 interface StudentCardProps {
   student: StudentEntry
@@ -20,8 +21,14 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
   const [lessons, setLessons] = useState<Lesson[]>([])
 
   useEffect(() => {
-    supabase.from('courses').select('*').order('name').then(({ data }) => {
-      if (data) setCourses(data)
+    supabase.from('courses').select('*').order('name').then(({ data, error }) => {
+      if (error || !data) {
+        toast.error('Gagal memuat daftar course. Cek koneksi internet / disable extension.')
+        return
+      }
+      setCourses(data)
+    }).catch(() => {
+      toast.error('Tidak bisa konek ke Supabase. Cek koneksi / browser extension.')
     })
   }, [])
 
@@ -96,7 +103,7 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
 
         <div>
           <Label className="text-slate-400 text-xs mb-1.5 block">Course</Label>
-          <Select value={student.courseId} onValueChange={handleCourseChange}>
+          <Select value={student.courseId || undefined} onValueChange={handleCourseChange}>
             <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
               <SelectValue placeholder="Pilih course..." />
             </SelectTrigger>
@@ -120,7 +127,7 @@ export default function StudentCard({ student, index, onChange, onRemove }: Stud
                       Lesson {lessonIndex + 1}
                     </Label>
                     <Select
-                      value={lessonEntry.lessonId}
+                      value={lessonEntry.lessonId || undefined}
                       onValueChange={(val) => handleLessonChange(lessonIndex, val)}
                     >
                       <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
